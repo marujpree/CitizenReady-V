@@ -1,0 +1,23 @@
+{
+  "name": "citizenready-v",
+  "version": "1.0.0",
+  "description": "A free web app that helps immigrants prepare for the US naturalization test. It combines civics practice with AI grading, English reading and writing practice, and progress tracking.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/marujpree/CitizenReady-V.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/marujpree/CitizenReady-V/issues"
+  },
+  "homepage": "https://github.com/marujpree/CitizenReady-V#readme",
+  "devDependencies": {
+    "supabase": "^2.122.0"
+  }
+}
