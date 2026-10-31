@@ -11,3 +11,9 @@ coverage/
 
 # supabase local
 supabase/.temp/
+
+# agent skills installed with `npx skills add`
+.agents/
+.claude/skills/
+skills-lock.json
+.taste-skill/
