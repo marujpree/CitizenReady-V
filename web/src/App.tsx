@@ -1,5 +1,27 @@
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import { AuthProvider } from '@/auth/AuthProvider'
+import { ProtectedRoute } from '@/auth/ProtectedRoute'
+import HomePage from '@/pages/HomePage'
+import LoginPage from '@/pages/LoginPage'
+import SignupPage from '@/pages/SignupPage'
+
+const queryClient = new QueryClient()
+
 export default function App() {
   return (
-    <h1 className="p-8 text-4xl font-bold text-blue-600">CitizenReady</h1>
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <BrowserRouter>
+          <Routes>
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/signup" element={<SignupPage />} />
+            <Route element={<ProtectedRoute />}>
+              <Route path="/" element={<HomePage />} />
+            </Route>
+          </Routes>
+        </BrowserRouter>
+      </AuthProvider>
+    </QueryClientProvider>
   )
 }
