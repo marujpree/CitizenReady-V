@@ -37,7 +37,7 @@ export default function SignupPage() {
     },
   })
 
-  if (user) return <Navigate to="/" replace />
+  if (user) return <Navigate to="/dashboard" replace />
 
   async function onSubmit(values: SignupValues) {
     setFormError(null)
