@@ -9,6 +9,7 @@ import LandingPage from '@/pages/LandingPage'
 import LoginPage from '@/pages/LoginPage'
 import NotFoundPage from '@/pages/NotFoundPage'
 import PracticePage from '@/pages/PracticePage'
+import SettingsPage from '@/pages/SettingsPage'
 import SignupPage from '@/pages/SignupPage'
 
 const queryClient = new QueryClient()
@@ -27,6 +28,7 @@ export default function App() {
               <Route element={<AppShell />}>
                 <Route path="/dashboard" element={<DashboardPage />} />
                 <Route path="/practice" element={<PracticePage />} />
+                <Route path="/settings" element={<SettingsPage />} />
               </Route>
             </Route>
             <Route path="*" element={<NotFoundPage />} />

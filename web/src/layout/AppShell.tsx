@@ -31,6 +31,9 @@ export function AppShell() {
               <NavLink to="/practice" className={navClass}>
                 Practice
               </NavLink>
+              <NavLink to="/settings" className={navClass}>
+                Settings
+              </NavLink>
             </nav>
           </div>
           <div className="flex items-center gap-3">
