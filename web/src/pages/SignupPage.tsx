@@ -48,7 +48,9 @@ export default function SignupPage() {
     const { data, error } = await supabase.auth.signUp({
       email: values.email,
       password: values.password,
-      options: { data: { full_name: values.fullName, test_version: values.testVersion } },
+      options: {
+        data: { full_name: `${values.firstName} ${values.lastName}`, test_version: values.testVersion },
+      },
     })
     if (error) {
       setFormError(error.message)
@@ -84,15 +86,26 @@ export default function SignupPage() {
         <OrDivider />
       </div>
       <form onSubmit={handleSubmit(onSubmit)} noValidate className="mt-5 flex flex-col gap-4">
-        <Field
-          id="fullName"
-          label="Your name"
-          type="text"
-          autoComplete="name"
-          maxLength={80}
-          error={errors.fullName?.message}
-          {...register('fullName')}
-        />
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Field
+            id="firstName"
+            label="First name"
+            type="text"
+            autoComplete="given-name"
+            maxLength={40}
+            error={errors.firstName?.message}
+            {...register('firstName')}
+          />
+          <Field
+            id="lastName"
+            label="Last name"
+            type="text"
+            autoComplete="family-name"
+            maxLength={40}
+            error={errors.lastName?.message}
+            {...register('lastName')}
+          />
+        </div>
         <Field
           id="email"
           label="Email"
