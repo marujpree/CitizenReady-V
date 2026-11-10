@@ -3,6 +3,7 @@ import express from 'express'
 import helmet from 'helmet'
 import { env } from './env.js'
 import { quizRouter } from './routes/quiz.js'
+import { speechRouter } from './routes/speech.js'
 
 export const app = express()
 
@@ -15,3 +16,4 @@ app.get('/health', (_req, res) => {
 })
 
 app.use('/quiz', quizRouter)
+app.use('/speech', speechRouter)
