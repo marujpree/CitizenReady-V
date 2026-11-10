@@ -2,6 +2,7 @@ import cors from 'cors'
 import express from 'express'
 import helmet from 'helmet'
 import { env } from './env.js'
+import { englishRouter } from './routes/english.js'
 import { quizRouter } from './routes/quiz.js'
 import { speechRouter } from './routes/speech.js'
 
@@ -15,5 +16,6 @@ app.get('/health', (_req, res) => {
   res.json({ status: 'ok' })
 })
 
+app.use('/english', englishRouter)
 app.use('/quiz', quizRouter)
 app.use('/speech', speechRouter)
