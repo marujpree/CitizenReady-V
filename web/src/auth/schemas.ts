@@ -3,13 +3,24 @@ import { z } from 'zod'
 // Letters from any language, then letters, spaces, apostrophes, periods and hyphens.
 const NAME_PATTERN = /^[\p{L}\p{M}][\p{L}\p{M} .'’-]*$/u
 
+// One name field (first or last): required, trimmed, letters and common punctuation.
+const nameField = (label: string) =>
+  z
+    .string()
+    .trim()
+    .min(1, `Enter your ${label}`)
+    .max(40, 'Use 40 characters or fewer')
+    .regex(NAME_PATTERN, 'Use letters, spaces, hyphens, apostrophes or periods')
+
 // 72 is the most characters Supabase's password hashing (bcrypt) reads.
 export const PASSWORD_MAX = 72
 
 // Each rule is shown as a live checklist on sign-up and enforced by the schema.
+// Keep in step with [auth] in supabase/config.toml, which enforces the same rules on the server.
 export const passwordRules = [
   { id: 'length', label: 'At least 8 characters', test: (v: string) => v.length >= 8 },
-  { id: 'letter', label: 'A letter', test: (v: string) => /\p{L}/u.test(v) },
+  { id: 'lower', label: 'A lowercase letter', test: (v: string) => /\p{Ll}/u.test(v) },
+  { id: 'upper', label: 'An uppercase letter', test: (v: string) => /\p{Lu}/u.test(v) },
   { id: 'number', label: 'A number', test: (v: string) => /\d/.test(v) },
 ] as const
 
@@ -27,18 +38,18 @@ export const loginSchema = z.object({
 
 export const signupSchema = z
   .object({
-    fullName: z
-      .string()
-      .trim()
-      .min(2, 'Enter your name')
-      .max(80, 'Use 80 characters or fewer')
-      .regex(NAME_PATTERN, 'Use letters, spaces, hyphens, apostrophes or periods'),
+    firstName: nameField('first name'),
+    lastName: nameField('last name'),
     email,
     password: z
       .string()
       .max(PASSWORD_MAX, `Use ${PASSWORD_MAX} characters or fewer`)
       .refine((v) => passwordRules.every((rule) => rule.test(v)), 'Password is too weak'),
     confirmPassword: z.string().min(1, 'Confirm your password'),
+    // 2025 test: filed on or after Oct 20, 2025. 2008 test: filed before.
+    testVersion: z.union([z.literal(2025), z.literal(2008)]),
+    // 65/20 special consideration (65 or older, 20+ years a permanent resident).
+    special: z.boolean(),
   })
   .refine((v) => v.password === v.confirmPassword, {
     path: ['confirmPassword'],

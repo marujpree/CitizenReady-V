@@ -3,8 +3,6 @@ import type { NextFunction, Request, Response } from 'express'
 
 vi.stubEnv('SUPABASE_URL', 'http://localhost:54321')
 vi.stubEnv('SUPABASE_SECRET_KEY', 'test')
-vi.stubEnv('ANTHROPIC_API_KEY', 'test')
-vi.stubEnv('GROQ_API_KEY', 'test')
 
 const getUser = vi.fn()
 vi.mock('../supabase.js', () => ({ supabaseAdmin: { auth: { getUser } } }))

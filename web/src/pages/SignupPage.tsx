@@ -1,13 +1,15 @@
 import { useState } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useForm, useWatch } from 'react-hook-form'
+import { Controller, useForm, useWatch } from 'react-hook-form'
 import { Link, Navigate } from 'react-router-dom'
 import { AuthShell } from '@/auth/AuthShell'
 import { useAuth } from '@/auth/auth-context'
 import { Field } from '@/auth/Field'
 import { GoogleButton, OrDivider } from '@/auth/GoogleButton'
 import { PasswordRules } from '@/auth/PasswordRules'
+import { SpecialConsiderationToggle } from '@/auth/SpecialConsiderationToggle'
 import { signupSchema, type SignupValues } from '@/auth/schemas'
+import { TestVersionPicker } from '@/auth/TestVersionPicker'
 import { Button } from '@/components/ui/button'
 import { supabase } from '@/lib/supabase'
 
@@ -24,6 +26,7 @@ export default function SignupPage() {
     formState: { errors, isSubmitting },
   } = useForm<SignupValues>({
     resolver: zodResolver(signupSchema),
+    defaultValues: { testVersion: 2025, special: false },
     // Checks a field when you leave it, then on every keystroke after that.
     mode: 'onTouched',
   })
@@ -37,15 +40,22 @@ export default function SignupPage() {
     },
   })
 
-  if (user) return <Navigate to="/" replace />
+  if (user) return <Navigate to="/dashboard" replace />
 
   async function onSubmit(values: SignupValues) {
     setFormError(null)
-    // handle_new_user (migration 003) copies full_name into profiles.
+    // handle_new_user (migrations 003 and 012) copies full_name into profiles
+    // and test_version into user_settings.
     const { data, error } = await supabase.auth.signUp({
       email: values.email,
       password: values.password,
-      options: { data: { full_name: values.fullName } },
+      options: {
+        data: {
+          full_name: `${values.firstName} ${values.lastName}`,
+          test_version: values.testVersion,
+          special_consideration: values.special,
+        },
+      },
     })
     if (error) {
       setFormError(error.message)
@@ -81,15 +91,26 @@ export default function SignupPage() {
         <OrDivider />
       </div>
       <form onSubmit={handleSubmit(onSubmit)} noValidate className="mt-5 flex flex-col gap-4">
-        <Field
-          id="fullName"
-          label="Your name"
-          type="text"
-          autoComplete="name"
-          maxLength={80}
-          error={errors.fullName?.message}
-          {...register('fullName')}
-        />
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Field
+            id="firstName"
+            label="First name"
+            type="text"
+            autoComplete="given-name"
+            maxLength={40}
+            error={errors.firstName?.message}
+            {...register('firstName')}
+          />
+          <Field
+            id="lastName"
+            label="Last name"
+            type="text"
+            autoComplete="family-name"
+            maxLength={40}
+            error={errors.lastName?.message}
+            {...register('lastName')}
+          />
+        </div>
         <Field
           id="email"
           label="Email"
@@ -117,6 +138,20 @@ export default function SignupPage() {
           maxLength={72}
           error={errors.confirmPassword?.message}
           {...register('confirmPassword')}
+        />
+        <Controller
+          control={control}
+          name="testVersion"
+          render={({ field }) => (
+            <TestVersionPicker value={field.value} onChange={field.onChange} />
+          )}
+        />
+        <Controller
+          control={control}
+          name="special"
+          render={({ field }) => (
+            <SpecialConsiderationToggle checked={field.value} onChange={field.onChange} />
+          )}
         />
         {formError && (
           <p role="alert" className="text-sm text-destructive">
