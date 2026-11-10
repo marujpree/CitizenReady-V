@@ -76,6 +76,19 @@ describe('POST /speech/transcribe', () => {
   })
 })
 
+describe('GET /speech/status', () => {
+  it('needs a login', async () => {
+    const res = await request(app).get('/speech/status')
+    expect(res.status).toBe(401)
+  })
+
+  it('says transcription is on when a key is set, without leaking it', async () => {
+    const res = await request(app).get('/speech/status').set(auth)
+    expect(res.status).toBe(200)
+    expect(res.body).toEqual({ transcription: true })
+  })
+})
+
 describe('without a Groq key', () => {
   it('returns 503 so the web app uses browser speech recognition', async () => {
     vi.resetModules()
@@ -87,5 +100,13 @@ describe('without a Groq key', () => {
       .set({ ...auth, 'Content-Type': 'audio/webm' })
       .send(audio)
     expect(res.status).toBe(503)
+  })
+
+  it('reports transcription as off', async () => {
+    vi.resetModules()
+    delete process.env.GROQ_API_KEY
+    const { app: bare } = await import('../app.js')
+    const res = await request(bare).get('/speech/status').set(auth)
+    expect(res.body).toEqual({ transcription: false })
   })
 })

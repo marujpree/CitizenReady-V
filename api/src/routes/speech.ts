@@ -8,6 +8,12 @@ export const speechRouter = Router()
 
 speechRouter.use(ipLimiter)
 
+// Tells the web app whether Whisper is set up, so it knows to record audio for us
+// or use the browser's own speech recognition. Never returns the key.
+speechRouter.get('/status', requireAuth, (_req, res) => {
+  res.json({ transcription: !!env.GROQ_API_KEY })
+})
+
 // The browser sends the raw audio bytes (not JSON). A short answer is well under 1 MB,
 // so 2 MB is plenty and keeps one user from using up the shared Groq quota.
 const audioBody = express.raw({ type: 'audio/*', limit: '2mb' })
