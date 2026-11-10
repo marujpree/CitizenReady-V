@@ -31,11 +31,13 @@ export function getVoiceSupport(): VoiceSupport {
 }
 
 // One short tip, or null when everything we use works. Mentions what still works.
-export function voiceTip(s: VoiceSupport): string | null {
-  if (!s.synthesis && !s.recognition) {
+// `cloud` is true when the server has Whisper, which lets any browser that can record audio use the mic.
+export function voiceTip(s: VoiceSupport, cloud = false): string | null {
+  const canSpeak = s.recognition || (cloud && s.recording)
+  if (!s.synthesis && !canSpeak) {
     return `Voice features are not available in ${s.browser}. You can still type your answers. For voice, try Chrome, Edge or Safari.`
   }
-  if (!s.recognition) {
+  if (!canSpeak) {
     return `Speaking your answers works best in Chrome, Edge or Safari. ${s.browser === 'your browser' ? 'This browser' : s.browser} does not support it yet, so type your answers instead.`
   }
   if (s.browser === 'Firefox' && s.linux) {

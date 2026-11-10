@@ -135,13 +135,16 @@ export function QuestionView({
                 setText(e.target.value)
                 setSpoken(false)
               }}
-              placeholder={speech.listening ? 'Listening…' : 'Type your answer'}
+              placeholder={
+                speech.listening ? 'Listening…' : speech.busy ? 'Turning your voice into text…' : 'Type your answer'
+              }
               className="h-14! rounded-xl! px-4 text-lg!"
             />
             {speech.supported && !result && (
               <Button
                 type="button"
                 variant="outline"
+                disabled={speech.busy}
                 onClick={speech.listening ? speech.stop : speech.start}
                 aria-label={speech.listening ? 'Stop listening' : 'Answer with your voice'}
                 aria-pressed={speech.listening}

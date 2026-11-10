@@ -24,7 +24,7 @@ function getCtor(): RecognitionCtor | null {
   return w.SpeechRecognition ?? w.webkitSpeechRecognition ?? null
 }
 
-export function useSpeech(onText: (text: string) => void) {
+export function useBrowserSpeech(onText: (text: string) => void) {
   const [listening, setListening] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const ref = useRef<Recognition | null>(null)
