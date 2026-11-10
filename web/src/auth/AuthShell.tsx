@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
-import { NavLink } from 'react-router-dom'
+import { ArrowLeft } from 'lucide-react'
+import { Link, NavLink } from 'react-router-dom'
 import { Wordmark } from '@/components/Wordmark'
 
 const tabClass = ({ isActive }: { isActive: boolean }) =>
@@ -27,11 +28,26 @@ function AuthTabs() {
 export function AuthShell({ children }: { children: ReactNode }) {
   return (
     <main className="flex min-h-dvh flex-col items-center bg-muted px-4 pt-10 pb-12 sm:pt-16">
-      <Wordmark className="mb-8 text-foreground" />
+      <div className="mb-8 flex w-full max-w-md items-center justify-between">
+        <Link
+          to="/"
+          className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground"
+        >
+          <ArrowLeft className="size-4" aria-hidden="true" />
+          Back to home
+        </Link>
+        <Wordmark className="text-foreground" />
+      </div>
       <div className="w-full max-w-md rounded-3xl bg-white p-6 shadow-sm sm:p-10">
         <AuthTabs />
         <div className="mt-8">{children}</div>
       </div>
+      <p className="mt-6 text-sm text-muted-foreground">
+        Just looking?{' '}
+        <Link to="/preview" className="font-semibold text-foreground underline underline-offset-4">
+          Continue as guest
+        </Link>
+      </p>
     </main>
   )
 }
