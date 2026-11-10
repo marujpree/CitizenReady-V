@@ -2,24 +2,22 @@ import { useState } from 'react'
 import { ListChecks, Mic, Timer } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import type { QuizMode } from './types'
-import { useCategories } from './useQuiz'
+import { TEST_FORMAT } from './format'
+import { useCategories, useTestVersion } from './useQuiz'
 
 type Choice = { mode: QuizMode; category?: string; count?: number }
 
 const modes = [
   {
     mode: 'mock_test' as const,
-    count: 10,
     icon: Mic,
     title: 'Mock interview',
-    text: '10 random questions, like the real civics test. Get 6 right to pass.',
   },
   {
     mode: 'practice_exam' as const,
     count: 20,
     icon: Timer,
     title: 'Practice exam',
-    text: '20 random questions for a longer workout.',
   },
 ]
 
@@ -34,6 +32,13 @@ export function ModePicker({
 }) {
   const { data: categories, isPending, isError } = useCategories()
   const [category, setCategory] = useState<string | null>(null)
+  const { data: testVersion = 2025 } = useTestVersion()
+  const format = TEST_FORMAT[testVersion]
+  // The mock interview matches the real test for the user's version.
+  const modeText = {
+    mock_test: `${format.questions} random questions, like the real civics test. Get ${format.passMark} right to pass.`,
+    practice_exam: '20 random questions for a longer workout.',
+  }
 
   return (
     <div>
@@ -53,10 +58,10 @@ export function ModePicker({
           <section key={m.mode} className="flex flex-col rounded-3xl bg-white p-8">
             <m.icon className="size-7 text-brand-red" aria-hidden="true" />
             <h2 className="mt-4 text-xl font-semibold tracking-tight">{m.title}</h2>
-            <p className="mt-2 flex-1 text-muted-foreground">{m.text}</p>
+            <p className="mt-2 flex-1 text-muted-foreground">{modeText[m.mode]}</p>
             <Button
               disabled={starting}
-              onClick={() => onStart({ mode: m.mode, count: m.count })}
+              onClick={() => onStart({ mode: m.mode, count: 'count' in m ? m.count : undefined })}
               className="mt-6 h-11! rounded-lg! px-6 text-base"
             >
               {starting ? 'Starting…' : 'Start'}

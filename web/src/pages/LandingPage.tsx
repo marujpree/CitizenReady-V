@@ -201,7 +201,7 @@ export default function LandingPage() {
           <div className="mx-auto grid max-w-6xl gap-10 px-6 py-16 sm:grid-cols-3 sm:py-24">
             {[
               ['128', 'questions on the 2025 civics test, from USCIS'],
-              ['10', 'asked at the interview, and 6 right answers pass'],
+              ['20', 'asked at the interview, and 12 right answers pass'],
               ['Free', 'to practice, with no credit card'],
             ].map(([figure, label]) => (
               <Reveal key={figure}>
