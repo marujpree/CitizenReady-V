@@ -1,10 +1,11 @@
+import { SpecialConsiderationToggle } from '@/auth/SpecialConsiderationToggle'
 import { TestVersionPicker } from '@/auth/TestVersionPicker'
-import { useTestVersion, useUpdateTestVersion } from '@/quiz/useQuiz'
+import { useTestSettings, useUpdateSettings } from '@/quiz/useQuiz'
 
-// Account settings. For now: which version of the civics test you are preparing for.
+// Account settings: which civics test you are preparing for, and 65/20 special consideration.
 export default function SettingsPage() {
-  const { data: testVersion, isPending, isError } = useTestVersion()
-  const update = useUpdateTestVersion()
+  const { data: settings, isPending, isError } = useTestSettings()
+  const update = useUpdateSettings()
 
   return (
     <main className="mx-auto max-w-3xl px-6 py-10">
@@ -21,20 +22,25 @@ export default function SettingsPage() {
             We could not load your settings. Refresh the page to try again.
           </p>
         )}
-        {testVersion && (
-          <div className="mt-6">
+        {settings && (
+          <div className="mt-6 flex flex-col gap-6">
             <TestVersionPicker
-              value={testVersion}
+              value={settings.testVersion}
               disabled={update.isPending}
-              onChange={(version) => update.mutate(version)}
+              onChange={(testVersion) => update.mutate({ testVersion })}
+            />
+            <SpecialConsiderationToggle
+              checked={settings.special}
+              disabled={update.isPending}
+              onChange={(special) => update.mutate({ special })}
             />
             {update.isError && (
-              <p role="alert" className="mt-4 text-sm text-destructive">
+              <p role="alert" className="text-sm text-destructive">
                 We could not save that. Try again.
               </p>
             )}
             {update.isSuccess && !update.isPending && (
-              <p role="status" className="mt-4 text-sm text-muted-foreground">
+              <p role="status" className="text-sm text-muted-foreground">
                 Saved.
               </p>
             )}

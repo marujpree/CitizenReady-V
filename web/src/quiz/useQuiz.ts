@@ -5,36 +5,43 @@ import { supabase } from '@/lib/supabase'
 import type { TestVersion } from './format'
 import type { AnswerResponse, QuizMode, StartResponse } from './types'
 
-// Which test the user is preparing for (2008 or 2025), from their settings.
-export function useTestVersion() {
+// The user's test settings: which test (2008 or 2025) and whether 65/20 special consideration is on.
+export type TestSettings = { testVersion: TestVersion; special: boolean }
+
+export function useTestSettings() {
   const { user } = useAuth()
   return useQuery({
-    queryKey: ['test-version', user?.id],
+    queryKey: ['test-settings', user?.id],
     enabled: !!user,
     staleTime: 5 * 60_000,
-    queryFn: async () => {
-      const { data, error } = await supabase.from('user_settings').select('test_version').single()
+    queryFn: async (): Promise<TestSettings> => {
+      const { data, error } = await supabase
+        .from('user_settings')
+        .select('test_version, special_consideration')
+        .single()
       if (error) throw error
-      return data.test_version as TestVersion
+      return { testVersion: data.test_version as TestVersion, special: data.special_consideration }
     },
   })
 }
 
-// Saves the user's test version. Questions, topics and dashboard numbers all depend on it.
-export function useUpdateTestVersion() {
+// Saves a change to the settings. Questions, topics and dashboard numbers all depend on them.
+export function useUpdateSettings() {
   const client = useQueryClient()
   const { user } = useAuth()
   return useMutation({
-    mutationFn: async (testVersion: TestVersion) => {
+    mutationFn: async (changes: Partial<TestSettings>) => {
       const { error } = await supabase
         .from('user_settings')
-        .update({ test_version: testVersion })
+        .update({
+          ...(changes.testVersion !== undefined && { test_version: changes.testVersion }),
+          ...(changes.special !== undefined && { special_consideration: changes.special }),
+        })
         .eq('user_id', user!.id)
       if (error) throw error
-      return testVersion
     },
     onSuccess: () => {
-      void client.invalidateQueries({ queryKey: ['test-version'] })
+      void client.invalidateQueries({ queryKey: ['test-settings'] })
       void client.invalidateQueries({ queryKey: ['categories'] })
       void client.invalidateQueries({ queryKey: ['dashboard'] })
     },
@@ -49,13 +56,19 @@ export function useCategories() {
     enabled: !!user,
     staleTime: 5 * 60_000,
     queryFn: async () => {
-      const settings = await supabase.from('user_settings').select('test_version').single()
+      const settings = await supabase
+        .from('user_settings')
+        .select('test_version, special_consideration')
+        .single()
       if (settings.error) throw settings.error
-      const { data, error } = await supabase
+      let query = supabase
         .from('civics_questions')
         .select('category')
         .eq('test_version', settings.data.test_version)
         .eq('is_active', true)
+      // 65/20: only the starred questions.
+      if (settings.data.special_consideration) query = query.eq('is_65_20', true)
+      const { data, error } = await query
       if (error) throw error
       const counts = new Map<string, number>()
       for (const row of data) counts.set(row.category, (counts.get(row.category) ?? 0) + 1)

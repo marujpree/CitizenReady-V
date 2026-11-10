@@ -3,8 +3,9 @@ import { ListChecks, Mic, Timer } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { getVoiceSupport, voiceTip } from '@/lib/voiceSupport'
 import type { QuizMode } from './types'
-import { TEST_FORMAT } from './format'
-import { useCategories, useTestVersion } from './useQuiz'
+import { SPECIAL_CONSIDERATION, TEST_FORMAT } from './format'
+import { useCategories, useTestSettings } from './useQuiz'
+import { useSpeechStatus } from './useSpeech'
 
 type Choice = { mode: QuizMode; category?: string; count?: number }
 
@@ -33,14 +34,20 @@ export function ModePicker({
 }) {
   const { data: categories, isPending, isError } = useCategories()
   const [category, setCategory] = useState<string | null>(null)
-  const { data: testVersion = 2025 } = useTestVersion()
-  const tip = voiceTip(getVoiceSupport())
-  const format = TEST_FORMAT[testVersion]
-  // The mock interview matches the real test for the user's version.
+  const { data: settings } = useTestSettings()
+  const special = settings?.special ?? false
+  const format = special ? SPECIAL_CONSIDERATION : TEST_FORMAT[settings?.testVersion ?? 2025]
+  // The mock interview matches the real test for the user's version and special consideration.
   const modeText = {
-    mock_test: `${format.questions} random questions, like the real civics test. Get ${format.passMark} right to pass.`,
-    practice_exam: '20 random questions for a longer workout.',
+    mock_test: special
+      ? `${format.questions} of your 20 starred questions, like the real 65/20 test. Get ${format.passMark} right to pass.`
+      : `${format.questions} random questions, like the real civics test. Get ${format.passMark} right to pass.`,
+    practice_exam: special
+      ? 'All 20 starred questions, in a random order.'
+      : '20 random questions for a longer workout.',
   }
+  const { data: speechStatus } = useSpeechStatus()
+  const tip = voiceTip(getVoiceSupport(), speechStatus?.transcription === true)
 
   return (
     <div>
