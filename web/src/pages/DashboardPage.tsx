@@ -1,4 +1,5 @@
 import { Check, Circle } from 'lucide-react'
+import { Link } from 'react-router-dom'
 import { useDashboard } from '@/dashboard/useDashboard'
 import { Button } from '@/components/ui/button'
 import { useProfile } from '@/lib/useProfile'
@@ -69,11 +70,11 @@ export default function DashboardPage() {
             <div>
               <h2 className="text-2xl font-semibold tracking-tight">Ready for a practice round?</h2>
               <p className="mt-2 text-primary-foreground/85">
-                Quizzes are coming in the next update.
+                Take a mock interview, a practice exam, or work through one topic.
               </p>
             </div>
-            <Button disabled className="h-11! rounded-lg! bg-white! px-6 text-base text-primary!">
-              Start practicing
+            <Button asChild className="h-11! rounded-lg! bg-white! px-6 text-base text-primary!">
+              <Link to="/practice">Start practicing</Link>
             </Button>
           </section>
 

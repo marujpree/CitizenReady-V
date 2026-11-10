@@ -7,6 +7,7 @@ import DashboardPage from '@/pages/DashboardPage'
 import LandingPage from '@/pages/LandingPage'
 import LoginPage from '@/pages/LoginPage'
 import NotFoundPage from '@/pages/NotFoundPage'
+import PracticePage from '@/pages/PracticePage'
 import SignupPage from '@/pages/SignupPage'
 
 const queryClient = new QueryClient()
@@ -23,6 +24,7 @@ export default function App() {
             <Route element={<ProtectedRoute />}>
               <Route element={<AppShell />}>
                 <Route path="/dashboard" element={<DashboardPage />} />
+                <Route path="/practice" element={<PracticePage />} />
               </Route>
             </Route>
             <Route path="*" element={<NotFoundPage />} />
