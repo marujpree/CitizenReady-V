@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react'
-import { Check, Mic, MicOff, X } from 'lucide-react'
+import { Check, Mic, MicOff, Volume2, VolumeX, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { ApiError } from '@/lib/api'
 import type { AnswerResponse, QuizQuestion } from './types'
+import { useSpeak } from './useSpeak'
 import { useSpeech } from './useSpeech'
 import { useSubmitAnswer } from './useQuiz'
 
@@ -38,6 +39,7 @@ export function QuestionView({
     setSpoken(true)
   }, [])
   const speech = useSpeech(onSpeech)
+  const voice = useSpeak()
 
   useEffect(() => {
     shownAt.current = Date.now()
@@ -104,6 +106,18 @@ export function QuestionView({
         <h1 className="text-3xl leading-tight font-semibold tracking-tight sm:text-4xl">
           {question.question_text}
         </h1>
+        {voice.supported && (
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => (voice.speaking ? voice.stop() : voice.speak(question.question_text))}
+            aria-label={voice.speaking ? 'Stop reading the question' : 'Read the question aloud'}
+            className="mt-4 h-10! rounded-lg! px-4"
+          >
+            {voice.speaking ? <VolumeX className="size-5" /> : <Volume2 className="size-5" />}
+            {voice.speaking ? 'Stop' : 'Listen'}
+          </Button>
+        )}
 
         <form onSubmit={onSubmit} className="mt-8">
           <label htmlFor="answer" className="text-sm font-medium text-muted-foreground">
