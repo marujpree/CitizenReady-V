@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { gradeAnswer } from '../grading/grade.js'
 import { requireAuth } from '../middleware/auth.js'
 import { ipLimiter, userLimiter } from '../middleware/rate-limit.js'
+import { questionCountFor } from '../quiz/format.js'
 import { supabaseAdmin } from '../supabase.js'
 
 export const quizRouter = Router()
@@ -13,9 +14,6 @@ const startSchema = z.object({
   category: z.string().min(1).optional(),
   count: z.number().int().min(1).max(128).optional(),
 })
-
-// The real interview asks 10 questions. Other modes default to the same.
-const DEFAULT_COUNT = 10
 
 // Never select accepted_answers here: the response goes straight to the browser.
 const PUBLIC_COLUMNS =
@@ -78,8 +76,8 @@ quizRouter.post('/start', requireAuth, userLimiter({ windowMs: 60_000, limit: 20
     return
   }
 
-  // A category quiz covers the whole category unless a count is given.
-  const wanted = count ?? (mode === 'category' ? pool.length : DEFAULT_COUNT)
+  // A mock test matches the real interview for the user's test version.
+  const wanted = questionCountFor(mode, settings.test_version, count, pool.length)
   const questions = shuffle(pool).slice(0, wanted)
 
   const { data: attemptId, error: startError } = await supabaseAdmin.rpc('start_attempt', {
