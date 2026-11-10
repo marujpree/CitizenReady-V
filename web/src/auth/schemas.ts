@@ -39,6 +39,8 @@ export const signupSchema = z
       .max(PASSWORD_MAX, `Use ${PASSWORD_MAX} characters or fewer`)
       .refine((v) => passwordRules.every((rule) => rule.test(v)), 'Password is too weak'),
     confirmPassword: z.string().min(1, 'Confirm your password'),
+    // 2025 test: filed on or after Oct 20, 2025. 2008 test: filed before.
+    testVersion: z.union([z.literal(2025), z.literal(2008)]),
   })
   .refine((v) => v.password === v.confirmPassword, {
     path: ['confirmPassword'],
