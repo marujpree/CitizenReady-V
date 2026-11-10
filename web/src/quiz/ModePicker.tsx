@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { ListChecks, Mic, Timer } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { getVoiceSupport, voiceTip } from '@/lib/voiceSupport'
 import type { QuizMode } from './types'
 import { TEST_FORMAT } from './format'
 import { useCategories, useTestVersion } from './useQuiz'
@@ -33,6 +34,7 @@ export function ModePicker({
   const { data: categories, isPending, isError } = useCategories()
   const [category, setCategory] = useState<string | null>(null)
   const { data: testVersion = 2025 } = useTestVersion()
+  const tip = voiceTip(getVoiceSupport())
   const format = TEST_FORMAT[testVersion]
   // The mock interview matches the real test for the user's version.
   const modeText = {
@@ -46,6 +48,12 @@ export function ModePicker({
       <p className="mt-2 text-muted-foreground">
         Type your answers or tap the microphone and say them out loud.
       </p>
+
+      {tip && (
+        <p role="note" className="mt-4 rounded-xl bg-white px-4 py-3 text-sm text-muted-foreground">
+          {tip}
+        </p>
+      )}
 
       {error && (
         <p role="alert" className="mt-6 text-destructive">
