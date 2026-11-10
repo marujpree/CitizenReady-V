@@ -7,6 +7,7 @@ import { useAuth } from '@/auth/auth-context'
 import { Field } from '@/auth/Field'
 import { GoogleButton, OrDivider } from '@/auth/GoogleButton'
 import { PasswordRules } from '@/auth/PasswordRules'
+import { SpecialConsiderationToggle } from '@/auth/SpecialConsiderationToggle'
 import { signupSchema, type SignupValues } from '@/auth/schemas'
 import { TestVersionPicker } from '@/auth/TestVersionPicker'
 import { Button } from '@/components/ui/button'
@@ -25,7 +26,7 @@ export default function SignupPage() {
     formState: { errors, isSubmitting },
   } = useForm<SignupValues>({
     resolver: zodResolver(signupSchema),
-    defaultValues: { testVersion: 2025 },
+    defaultValues: { testVersion: 2025, special: false },
     // Checks a field when you leave it, then on every keystroke after that.
     mode: 'onTouched',
   })
@@ -49,7 +50,11 @@ export default function SignupPage() {
       email: values.email,
       password: values.password,
       options: {
-        data: { full_name: `${values.firstName} ${values.lastName}`, test_version: values.testVersion },
+        data: {
+          full_name: `${values.firstName} ${values.lastName}`,
+          test_version: values.testVersion,
+          special_consideration: values.special,
+        },
       },
     })
     if (error) {
@@ -139,6 +144,13 @@ export default function SignupPage() {
           name="testVersion"
           render={({ field }) => (
             <TestVersionPicker value={field.value} onChange={field.onChange} />
+          )}
+        />
+        <Controller
+          control={control}
+          name="special"
+          render={({ field }) => (
+            <SpecialConsiderationToggle checked={field.value} onChange={field.onChange} />
           )}
         />
         {formError && (

@@ -48,6 +48,8 @@ export const signupSchema = z
     confirmPassword: z.string().min(1, 'Confirm your password'),
     // 2025 test: filed on or after Oct 20, 2025. 2008 test: filed before.
     testVersion: z.union([z.literal(2025), z.literal(2008)]),
+    // 65/20 special consideration (65 or older, 20+ years a permanent resident).
+    special: z.boolean(),
   })
   .refine((v) => v.password === v.confirmPassword, {
     path: ['confirmPassword'],
