@@ -6,6 +6,10 @@ export const TEST_FORMAT = {
   2025: { questions: 20, passMark: 12 },
 } as const
 
+// 65/20 special consideration (65 or older, 20+ years a permanent resident): the officer
+// asks 10 of the 20 starred questions and the applicant needs 6. Same for both versions.
+export const SPECIAL_CONSIDERATION = { questions: 10, passMark: 6 } as const
+
 export type TestVersion = keyof typeof TEST_FORMAT
 export type QuizMode = 'category' | 'practice_exam' | 'mock_test'
 
@@ -18,8 +22,10 @@ export function questionCountFor(
   testVersion: number,
   requested: number | undefined,
   poolSize: number,
+  special = false,
 ): number {
   if (mode === 'mock_test') {
+    if (special) return SPECIAL_CONSIDERATION.questions
     return (TEST_FORMAT[testVersion as TestVersion] ?? TEST_FORMAT[2025]).questions
   }
   if (mode === 'category') return requested ?? poolSize

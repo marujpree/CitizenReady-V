@@ -49,7 +49,7 @@ quizRouter.post('/start', requireAuth, userLimiter({ windowMs: 60_000, limit: 20
 
   const { data: settings, error: settingsError } = await supabaseAdmin
     .from('user_settings')
-    .select('test_version')
+    .select('test_version, special_consideration')
     .eq('user_id', userId)
     .single()
 
@@ -63,6 +63,8 @@ quizRouter.post('/start', requireAuth, userLimiter({ windowMs: 60_000, limit: 20
     .select(PUBLIC_COLUMNS)
     .eq('test_version', settings.test_version)
     .eq('is_active', true)
+  // 65/20: only the 20 starred questions.
+  if (settings.special_consideration) query = query.eq('is_65_20', true)
   if (mode === 'category') query = query.eq('category', category!)
 
   const { data: pool, error: poolError } = await query
@@ -77,7 +79,13 @@ quizRouter.post('/start', requireAuth, userLimiter({ windowMs: 60_000, limit: 20
   }
 
   // A mock test matches the real interview for the user's test version.
-  const wanted = questionCountFor(mode, settings.test_version, count, pool.length)
+  const wanted = questionCountFor(
+    mode,
+    settings.test_version,
+    count,
+    pool.length,
+    settings.special_consideration,
+  )
   const questions = shuffle(pool).slice(0, wanted)
 
   const { data: attemptId, error: startError } = await supabaseAdmin.rpc('start_attempt', {

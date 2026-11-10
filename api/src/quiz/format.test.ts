@@ -11,6 +11,11 @@ describe('questionCountFor', () => {
     expect(questionCountFor('mock_test', 2025, 3, 128)).toBe(20)
   })
 
+  it('asks 10 questions in a 65/20 mock test for either version', () => {
+    expect(questionCountFor('mock_test', 2008, undefined, 20, true)).toBe(10)
+    expect(questionCountFor('mock_test', 2025, undefined, 20, true)).toBe(10)
+  })
+
   it('falls back to the 2025 format for an unknown version', () => {
     expect(questionCountFor('mock_test', 1999, undefined, 10)).toBe(20)
   })
