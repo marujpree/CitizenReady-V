@@ -4,6 +4,7 @@ import { AuthProvider } from '@/auth/AuthProvider'
 import { ProtectedRoute } from '@/auth/ProtectedRoute'
 import { AppShell } from '@/layout/AppShell'
 import DashboardPage from '@/pages/DashboardPage'
+import EnglishPage from '@/pages/EnglishPage'
 import GuestPreviewPage from '@/pages/GuestPreviewPage'
 import LandingPage from '@/pages/LandingPage'
 import LoginPage from '@/pages/LoginPage'
@@ -29,6 +30,7 @@ export default function App() {
               <Route element={<AppShell />}>
                 <Route path="/dashboard" element={<DashboardPage />} />
                 <Route path="/practice" element={<PracticePage />} />
+                <Route path="/english" element={<EnglishPage />} />
                 <Route path="/resources" element={<ResourcesPage />} />
                 <Route path="/settings" element={<SettingsPage />} />
               </Route>
